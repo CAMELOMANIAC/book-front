@@ -1,30 +1,20 @@
 "use client";
 import { useBackHeader } from "@/context/backHeaderStore";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import ShareIcon from "@/public/icons/shareIcon.svg";
 import KakaoInfoTip from "@/components/kakaoInfoTip/KakaoInfoTip";
-import { Book } from "@/types/api";
+import { Book } from "@/types/dto/book";
 
-type Props = { isbn: number; bookData: Book | undefined };
-const BookHeaderHelper = ({ isbn, bookData }: Readonly<Props>) => {
+type Props = { bookData: Book | undefined };
+const BookHeaderHelper = ({ bookData }: Readonly<Props>) => {
   const { setTitle, setEtcButton } = useBackHeader();
-  const [bookNameState, setBookNameState] = useState(bookData?.title || "");
-  useEffect(() => {
-    //카카오 검색데이터 없을시 세션 스토리지에서 제목을 가져옴
-    if (!bookData?.title) {
-      const bookName = sessionStorage.getItem(isbn.toString());
-      if (bookName) {
-        setBookNameState(JSON.parse(bookName).TITLE_NM);
-      }
-    }
-  }, [bookData, isbn]);
 
   useEffect(() => {
-    if (typeof bookNameState !== "string") return;
+    if (typeof bookData?.title !== "string") return;
     setTitle(
       <h1 className="flex max-w-[50vw] flex-row items-center justify-start text-lg font-semibold lg:max-w-[40vw]">
-        <span className="truncate">{bookNameState}</span>
-        {bookData?.isbn && <KakaoInfoTip />}
+        <span className="truncate">{bookData.title}</span>
+        {bookData?.id && <KakaoInfoTip />}
       </h1>
     );
 
@@ -33,7 +23,7 @@ const BookHeaderHelper = ({ isbn, bookData }: Readonly<Props>) => {
         navigator
           .share({
             title: "HBD 책 소개",
-            text: bookNameState,
+            text: bookData.title,
             url: window.location.href,
           })
           .then(() => console.log("공유 성공"))
@@ -47,7 +37,7 @@ const BookHeaderHelper = ({ isbn, bookData }: Readonly<Props>) => {
       setTitle("");
       setEtcButton(null);
     };
-  }, [setTitle, setEtcButton, bookNameState, bookData]);
+  }, [setTitle, setEtcButton, bookData]);
   return null;
 };
 
