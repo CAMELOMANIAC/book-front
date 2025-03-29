@@ -3,47 +3,30 @@ import BookDetailImageSection from "./BookDetailImageSection";
 import BookTitleSection from "./BookTitleSection";
 import BookDetailSection from "./BookDetailSection";
 import RecommandedItem from "./RecommandedItem";
-import { CsvSuspenseResource } from "@/app/(client)/(backButtonHeader)/birth-day/[isbn]/page";
-import { KakaoSuspenseResource } from "@/app/(client)/(backButtonHeader)/book/[isbn]/page";
+import { SuspenseResource } from "@/app/(client)/(backButtonHeader)/birth-day/[id]/page";
 
-type Props<T extends CsvSuspenseResource | KakaoSuspenseResource> = {
+type Props<T extends SuspenseResource> = {
   className?: string;
   suspenseResource: T;
 } & HTMLAttributes<HTMLDivElement>;
-const BookDetail = <T extends CsvSuspenseResource | KakaoSuspenseResource>({
-  className,
-  suspenseResource,
-  ...props
-}: Readonly<Props<T>>) => {
+const BookDetail = <T extends SuspenseResource>({ className, suspenseResource, ...props }: Readonly<Props<T>>) => {
   const result = suspenseResource.read();
-  const bookData = Array.isArray(result)
-    ? {
-        thumbnail: result[0].IMAGE_URL,
-        datetime: result[0].TWO_PBLICTE_DE,
-        title: result[0].TITLE_NM,
-        url: "",
-        authors: result[0].AUTHR_NM.split(", "),
-        publisher: result[0].PUBLISHER_NM,
-        contents: result[0].BOOK_INTRCN_CN,
-      }
-    : result.documents[0];
-
-  const kstBirthDay = new Date(new Date(bookData?.datetime).getTime() + 9 * 60 * 60 * 1000);
+  const kstBirthDay = new Date(new Date(result?.publishDate).getTime() + 9 * 60 * 60 * 1000);
 
   return (
     <div className={`relative flex size-full flex-col px-[var(--client-layout-margin)] ${className || ""}`} {...props}>
-      <BookDetailImageSection imageUrl={bookData?.thumbnail} birthDay={kstBirthDay} className="my-6" />
+      <BookDetailImageSection imageUrl={result?.imageUrl} birthDay={kstBirthDay} className="my-6" />
       <BookTitleSection
-        bookName={bookData?.title || "책 이름(정보 미제공)"}
+        bookName={result?.title || "책 이름(정보 미제공)"}
         birthDayDate={kstBirthDay}
-        url={bookData?.url}
+        url={`https://search.daum.net/search?w=bookpage&bookId=${result?.id}&q=${result?.title}`}
         className="mb-10"
       />
       <BookDetailSection
-        author={bookData?.authors.join(", ") || "저자 이름(정보 미제공)"}
-        pulisher={bookData?.publisher || "출판사(정보 미제공)"}
-        description={bookData?.contents || "책 소개(정보 미제공)"}
-        viewMoreUrl={bookData?.url}
+        author={result?.author || "저자 이름(정보 미제공)"}
+        pulisher={result?.publisher || "출판사(정보 미제공)"}
+        description={result?.description || "책 소개(정보 미제공)"}
+        viewMoreUrl={`https://search.daum.net/search?w=bookpage&bookId=${result?.id}&q=${result?.title}`}
         className="mb-10"
       />
       <section>
