@@ -2,10 +2,9 @@ import LoadingSpinner from "@/components/common/LoadingSpinner";
 import MainBookSlide from "@/components/mainBookSlide/MainBookSlide";
 import MainScheduleSlide from "@/components/mainScheduleSlide/MainScheduleSlide";
 import PromotionContract from "@/components/promotionContract/PromotionContract";
-import getBirthdayBook from "@/function/server/getBirtdayBook";
 import { Suspense } from "react";
-import BirthDayBookSaveHelper from "./BirthDayBookSaveHelper";
 import TodayLibrary from "@/components/todayLibrary/TodayLibrary";
+import { Book } from "@/types/dto/book";
 
 const Home = () => {
   return (
@@ -23,11 +22,31 @@ const Home = () => {
 export default Home;
 
 const MainBookSlideContainer = async () => {
-  const data = await getBirthdayBook();
+  //const data = await getBirthdayBook();
+  const data = await fetchBirthdayBook();
+
   return (
     <>
-      <BirthDayBookSaveHelper books={data} />
-      <MainBookSlide className="mb-12" books={data.slice(0, 6)} />
+      {data ? (
+        <>
+          <MainBookSlide className="mb-12" books={data.slice(0, 6)} />
+        </>
+      ) : (
+        "서버와 통신이 원활하지 않습니다"
+      )}
     </>
   );
+};
+
+const fetchBirthdayBook = async (): Promise<Book[] | undefined> => {
+  try {
+    const result = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/books/birthday`);
+    if (!result.ok) {
+      throw new Error("통신 실패: " + result.status);
+    }
+    const response = await result.json();
+    return response.result;
+  } catch (error) {
+    console.log("오류 발생", error);
+  }
 };
