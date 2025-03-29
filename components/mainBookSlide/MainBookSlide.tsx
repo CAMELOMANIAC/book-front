@@ -2,10 +2,10 @@
 import React, { HTMLAttributes, useEffect, useLayoutEffect, useRef, useState } from "react";
 import BookDescription from "./BookDescription";
 import ReactConfetti from "react-confetti";
+import { Book } from "@/types/dto/book";
 import MainBookSlideContainer from "./MainBookSlideContainer";
-import { CSVBook } from "@/types/api";
 
-type Props = { className?: string; books: CSVBook[] } & HTMLAttributes<HTMLDivElement>;
+type Props = { className?: string; books: Book[] } & HTMLAttributes<HTMLDivElement>;
 const MainBookSlide = ({ className, books, ...props }: Readonly<Props>) => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
@@ -48,7 +48,7 @@ const MainBookSlide = ({ className, books, ...props }: Readonly<Props>) => {
         style={{ zIndex: 0, display: "absolute" }}
       />
       <BookDescription createdAt={new Date()} className="z-10 px-[var(--client-layout-margin)]" />
-      <MainBookSlideContainer books={books.slice(0, 6)} setConfettiWind={setConfettiWind} />
+      <MainBookSlideContainer books={books} setConfettiWind={setConfettiWind} />
     </section>
   );
 };
