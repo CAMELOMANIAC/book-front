@@ -1,7 +1,7 @@
 "use client";
 import BookGrid from "@/components/bookGrid/BookGrid";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
-import { CSVBook } from "@/types/api";
+import { Book } from "@/types/dto/book";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 
@@ -11,7 +11,7 @@ const BirthDayBookGridContainer = () => {
     queryKey: ["birthDayBook", new Date().getUTCDate()], //UTC날짜를 기준으로 쿼리키 유효
     queryFn: fetchInfiniteCsvData,
     initialPageParam: 0,
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    getNextPageParam: (lastPage) => (lastPage ? lastPage.nextCursor : undefined),
     staleTime: 24 * 60 * 60 * 1000,
   });
 
@@ -35,7 +35,11 @@ const BirthDayBookGridContainer = () => {
       {!isLoading ? (
         <>
           {data?.pages.map((page, index) => (
-            <BookGrid key={index} books={page.data || []} className={`${data?.pages.length > 0 && "py-0 pt-[10px]"}`} />
+            <BookGrid
+              key={index}
+              books={page?.data || []}
+              className={`${data?.pages.length > 0 && "py-0 pt-[10px]"}`}
+            />
           ))}
           {hasNextPage && (
             <button onClick={() => fetchNextPage()} ref={nextPageButtonRef}>
@@ -52,17 +56,23 @@ const BirthDayBookGridContainer = () => {
 
 export default BirthDayBookGridContainer;
 
+//백엔드 api 페이지네이션 값이 없으므로 다시 수정필요
 const fetchInfiniteCsvData = async ({ pageParam }: { pageParam: number }) => {
-  const allIsbns: string[] = JSON.parse(sessionStorage.getItem("ISBN") || "[]");
+  const allIsbns: string[] = JSON.parse(sessionStorage.getItem("id") || "[]");
   const isbns = allIsbns.slice(pageParam, pageParam + 6);
-  const response = await fetch("/api/book?" + isbns.map((isbn) => `isbn=${isbn}`).join("&"));
-  const data = await response.json();
-  const keys = Object.keys(data.data);
-  const parseData: CSVBook[] = keys.map((key) => data.data[key]);
-
-  const hasNextPage = pageParam + 6 < allIsbns.length;
-  return {
-    data: parseData,
-    nextCursor: hasNextPage ? pageParam + 6 : undefined,
-  };
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/books` + isbns.map((isbn) => `isbn=${isbn}`).join("&")
+    );
+    const data = await response.json();
+    const keys = Object.keys(data.data);
+    const parseData: Book[] = keys.map((key) => data.data[key]);
+    const hasNextPage = pageParam + 6 < allIsbns.length;
+    return {
+      data: parseData,
+      nextCursor: hasNextPage ? pageParam + 6 : undefined,
+    };
+  } catch (error) {
+    console.log(error);
+  }
 };
