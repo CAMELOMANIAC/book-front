@@ -1,4 +1,5 @@
 "use client";
+import { DehydratedState, HydrationBoundary } from "@tanstack/react-query";
 import React, { createContext, Dispatch, ReactNode, SetStateAction, useContext, useState } from "react";
 type PageContextProps<T> = {
   data: T;
@@ -11,6 +12,7 @@ const PageDataContext = createContext<PageContextProps<unknown> | undefined>(und
 type Props<T> = {
   children?: ReactNode;
   initialData: T;
+  state?: DehydratedState;
 };
 /**
  * 서버페이지가 요청한 값을 하위 클라이언트 컴포넌트에게 전달하기 위한 contextAPI
@@ -18,12 +20,12 @@ type Props<T> = {
  * 해당 프로바이더 사용시 제너릭 인터페이스 주입필요
  * @example <PageDataProvider<Interface> initialData={data}>
  */
-const AdminPageDataProvider = <T,>({ children, initialData }: Props<T>) => {
+const AdminPageDataProvider = <T,>({ children, initialData, state }: Props<T>) => {
   const [selectRow, setSelectRow] = useState<number>();
   const [currentPage, setCurrentPage] = useState<number>(1);
   return (
     <PageDataContext.Provider value={{ data: initialData, selectRow, setSelectRow, currentPage, setCurrentPage }}>
-      {children}
+      <HydrationBoundary state={state}>{children}</HydrationBoundary>;
     </PageDataContext.Provider>
   );
 };

@@ -4,6 +4,8 @@ import AdminRowControllerContainer from "@/components/adminRowController/AdminRo
 import AdminRowList from "@/components/adminRowList/AdminRowList";
 import AdminPaginationController from "@/components/adminPaginationController/AdminPaginationController";
 import { AdminPublisherInputs } from "@/components/popupProvider/adminForm/AdminPublisherForm";
+import { Publisher as DTOPublisher } from "@/types/dto/publisher";
+import { dehydrate, QueryClient } from "@tanstack/react-query";
 
 const Publisher = async ({ searchParams }: { searchParams: Promise<{ keyword?: string }> }) => {
   if (false) {
@@ -12,9 +14,13 @@ const Publisher = async ({ searchParams }: { searchParams: Promise<{ keyword?: s
   }
   const { keyword } = await searchParams;
   console.log("searchParams 테스트", keyword);
+  const queryClient = new QueryClient();
+  await queryClient.prefetchQuery({ queryKey: ["adminPublishers"], queryFn: fetchAdminPublishers });
+  const dehydratedState = dehydrate(queryClient);
 
   return (
     <AdminPageDataProvider<AdminPublisherInputs[]>
+      state={dehydratedState}
       initialData={[
         {
           publisherName: "test",
@@ -28,17 +34,15 @@ const Publisher = async ({ searchParams }: { searchParams: Promise<{ keyword?: s
       <AdminRowControllerContainer />
       <AdminRowList<AdminPublisherInputs[]>
         keys={[
-          "isbn",
-          "urls",
-          "urlsasdfasdfafsasdfasfd",
-          "312342344",
-          "memo",
-          "publisherName",
-          "312342564",
-          "31264663264",
-          "31264663264",
-          "tag",
-          "311234",
+          "id",
+          "name",
+          "description",
+          "websiteUrl",
+          "logoUrl",
+          "newsletterUrl",
+          "playlistUrl",
+          "createdAt",
+          "updatedAt",
         ]}
       ></AdminRowList>
       <AdminPaginationController />
@@ -47,3 +51,11 @@ const Publisher = async ({ searchParams }: { searchParams: Promise<{ keyword?: s
 };
 
 export default Publisher;
+
+const fetchAdminPublishers = async (): Promise<DTOPublisher[]> => {
+  const res = await fetch(process.env.NEXT_PUBLIC_BACKEND_URL + "/admin/publishers");
+  if (!res.ok) {
+    throw new Error("Failed to fetch data");
+  }
+  return res.json();
+};
