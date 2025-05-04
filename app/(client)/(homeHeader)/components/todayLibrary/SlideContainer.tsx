@@ -1,19 +1,25 @@
 "use client";
-import React, { ReactNode, useState } from "react";
+import React, { useState } from "react";
 import SlideIndicator from "./SlideIndicator";
+import TodayLibraryItem from "./TodayLibraryItem";
+import { ListResponseRecommendedBookDto } from "@/types/dto";
 
 type Props = {
   className?: string;
-  children?: ReactNode;
-  pageCount: number;
+  todayLibrary: ListResponseRecommendedBookDto;
 };
-const SlideContainer = ({ className, children, pageCount, ...props }: Readonly<Props>) => {
+const SlideContainer = ({ className, todayLibrary, ...props }: Readonly<Props>) => {
   const [currentPage, setCurrentPage] = useState<number>(0);
   return (
     <div className={`relative flex w-full flex-col ${className || ""}`} {...props}>
-      {children}
+      <div className="grid grid-cols-3 gap-1">
+        {todayLibrary &&
+          [...new Array(...todayLibrary.items)].map((item, index) => (
+            <TodayLibraryItem key={index} publisher={item.publisher.name} imageUrl={item.titleImage} />
+          ))}
+      </div>
       <SlideIndicator
-        pageCount={pageCount}
+        pageCount={todayLibrary.items.length / 3}
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
         className="mt-7"

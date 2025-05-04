@@ -3,7 +3,7 @@ import Image from "next/image";
 
 type Props = {
   className?: string;
-  imageUrl: string;
+  imageUrl?: string;
   publisher: string;
 };
 const TodayLibraryItem = ({ className, imageUrl, publisher, ...props }: Readonly<Props>) => {
