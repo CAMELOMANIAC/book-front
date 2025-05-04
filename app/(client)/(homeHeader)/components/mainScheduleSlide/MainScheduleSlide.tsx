@@ -1,11 +1,14 @@
-import { HTMLAttributes } from "react";
+import { HTMLAttributes, Suspense } from "react";
 import MainScheduleSlideContainer from "./MainScheduleSlideContainer";
 import BackArrowIcon from "@/public/icons/backArrowIcon.svg";
 import Link from "next/link";
 import PromotionContract from "../promotionContract/PromotionContract";
+import fetchDailySchedule from "@/function/fetch/fetchDailySchedule";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 type Props = { className?: string } & HTMLAttributes<HTMLDivElement>;
-const MainScheduleSlide = ({ className, ...props }: Readonly<Props>) => {
+const MainScheduleSlide = async ({ className, ...props }: Readonly<Props>) => {
+  const dailySchedule = await fetchDailySchedule();
   return (
     <section
       className={`relative flex size-full flex-col pl-[var(--client-layout-margin)] pt-[var(--content-section-margin)] ${
@@ -25,7 +28,9 @@ const MainScheduleSlide = ({ className, ...props }: Readonly<Props>) => {
           <p>view all</p> <BackArrowIcon className="size-5 rotate-180" />
         </Link>
       </div>
-      <MainScheduleSlideContainer />
+      <Suspense fallback={<LoadingSpinner className="w-full" />}>
+        {dailySchedule && <MainScheduleSlideContainer scheduleItems={dailySchedule} />}
+      </Suspense>
       <Link href="/schedule/contactUs/eventPromotion" className="contents">
         <PromotionContract className="pr-[var(--client-layout-margin)]" />
       </Link>
