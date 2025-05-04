@@ -4,11 +4,11 @@ import { motion } from "framer-motion";
 import ArrowHeadIcon from "@/public/icons/arrowHeadIcon.svg";
 import BookItem from "./BookItem";
 import { isMobile } from "@/function/common";
-import { CSVBook } from "@/types/api";
+import { BookDto } from "@/types/dto";
 
 type Props = {
   className?: string;
-  books: CSVBook[];
+  books?: BookDto[];
   setConfettiWind: Dispatch<SetStateAction<number>>;
 } & HTMLAttributes<HTMLDivElement>;
 
@@ -16,7 +16,7 @@ const MainBookSlideContainer = ({ className, books, setConfettiWind, ...props }:
   const [slideViewSize, setSlideViewSize] = useState<number>();
   const [prevScrollIndex, setPrevScrollIndex] = useState<number>(0);
   const slideContainerRef = useRef<HTMLDivElement>(null);
-  const [booksData, setBooksData] = useState<Array<CSVBook> | undefined>(books);
+  const [booksData, setBooksData] = useState<Array<BookDto> | undefined>(books);
   const [isMobileState, setIsMobileState] = useState(false);
 
   //슬라이드 뷰 크기 조정용
@@ -112,15 +112,10 @@ const MainBookSlideContainer = ({ className, books, setConfettiWind, ...props }:
                 transition={{
                   layout: { duration: 0.15, ease: "easeInOut" },
                 }}
-                key={book.ISBN_THIRTEEN_NO}
+                key={book.isbn}
                 className="relative flex size-full items-end justify-center"
               >
-                <BookItem
-                  ind={index}
-                  isbn={book.ISBN_THIRTEEN_NO}
-                  imageUrl={book.IMAGE_URL}
-                  bookLength={booksData.length}
-                />
+                <BookItem ind={index} isbn={book.isbn} imageUrl={book.titleImage} bookLength={booksData.length} />
               </motion.div>
             ))}
         </div>

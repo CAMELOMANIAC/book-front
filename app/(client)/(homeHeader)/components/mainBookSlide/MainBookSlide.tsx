@@ -3,10 +3,12 @@ import React, { HTMLAttributes, useEffect, useLayoutEffect, useRef, useState } f
 import BookDescription from "./BookDescription";
 import ReactConfetti from "react-confetti";
 import MainBookSlideContainer from "./MainBookSlideContainer";
-import { CSVBook } from "@/types/api";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
+import useGetBirthDayBooks from "@/components/hooks/useGetBirthDayBooks";
 
-type Props = { className?: string; books: CSVBook[] } & HTMLAttributes<HTMLDivElement>;
-const MainBookSlide = ({ className, books, ...props }: Readonly<Props>) => {
+type Props = { className?: string } & HTMLAttributes<HTMLDivElement>;
+const MainBookSlide = ({ className, ...props }: Readonly<Props>) => {
+  const { data, status } = useGetBirthDayBooks();
   const sectionRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [confettiWind, setConfettiWind] = useState<number>(0);
@@ -48,7 +50,11 @@ const MainBookSlide = ({ className, books, ...props }: Readonly<Props>) => {
         style={{ zIndex: 0, display: "absolute" }}
       />
       <BookDescription createdAt={new Date()} className="z-10 px-[var(--client-layout-margin)]" />
-      <MainBookSlideContainer books={books.slice(0, 6)} setConfettiWind={setConfettiWind} />
+      {status === "success" ? (
+        <MainBookSlideContainer books={data?.slice(0, 6)} setConfettiWind={setConfettiWind} />
+      ) : (
+        <LoadingSpinner className="h-[30vw] w-full" />
+      )}
     </section>
   );
 };
