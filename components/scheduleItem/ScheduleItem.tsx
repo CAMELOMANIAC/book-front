@@ -6,7 +6,7 @@ export type ScheduleItemProps = {
   className?: string;
   typeName?: string;
   title?: string;
-  publisher?: string;
+  host?: string;
   startDate?: Date;
   endDate?: Date;
 } & HTMLAttributes<HTMLDivElement>;
@@ -14,7 +14,7 @@ const ScheduleItem = ({
   className,
   typeName,
   title,
-  publisher,
+  host,
   startDate,
   endDate,
   ...props
@@ -23,7 +23,7 @@ const ScheduleItem = ({
     <aside className={`relative flex min-w-fit flex-col gap-1 rounded-2xl border p-6 ${className || ""}`} {...props}>
       <p className="text-sm font-bold text-[var(--highlight-color)]">{typeName ?? "타입"}</p>
       <h3 className="font-semibold">{title ?? "제목"}</h3>
-      <p className="text-xs text-[var(--sub-color)]">{publisher ?? "출판사"}</p>
+      <p className="text-xs text-[var(--sub-color)]">{host ?? "주관사"}</p>
       <span className="flex size-full flex-row gap-1">
         <CalendarIcon className="w-3" />
         <p className="relative size-fit text-xs">
