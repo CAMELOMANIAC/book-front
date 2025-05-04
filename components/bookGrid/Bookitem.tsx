@@ -4,7 +4,7 @@ import EmptyImage from "../common/EmptyImage";
 
 type Props = {
   className?: string;
-  imageUrl: string;
+  imageUrl?: string;
   bookName?: string;
   author?: string;
   publisher?: string;
