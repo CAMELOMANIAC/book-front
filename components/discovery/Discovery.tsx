@@ -3,9 +3,20 @@ import CommonPillButton from "../common/CommonPillButton";
 import Image from "next/image";
 import DiscoveryItem from "./DiscoveryItem";
 import Link from "next/link";
+import EmptyImage from "../common/EmptyImage";
+import fetchDailyDiscovery from "@/function/fetch/fetchDailyDiscovery";
+
+enum ContentsType {
+  "VIDEO" = "유튜브",
+  "ARTICLE" = "글",
+  "PODCAST" = "팟캐스트",
+  "LINK" = "링크",
+  "SNS" = "SNS",
+}
 
 type Props = { className?: string } & HTMLAttributes<HTMLDivElement>;
-const Discovery = ({ className, ...props }: Readonly<Props>) => {
+const Discovery = async ({ className, ...props }: Readonly<Props>) => {
+  const dailyDiscoveryData = await fetchDailyDiscovery();
   return (
     <section
       className={`relative h-fit w-full px-[var(--client-layout-margin)] py-[var(--content-section-margin)] ${
@@ -19,27 +30,24 @@ const Discovery = ({ className, ...props }: Readonly<Props>) => {
           <p className="section-sub-title mb-4">좋은 책을 발견하는 새로운 관점 </p>
         </div>
         <div className="relative aspect-video w-full overflow-hidden rounded-xl">
-          <Image
-            alt="discovery"
-            src={
-              "https://s3-alpha-sig.figma.com/img/0765/8133/dcde9229b77417236ff0d50c7f427e83?Expires=1744588800&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=rOES0-J8KQ5hY1nRf0gj6BGpoFr7GYQtmMYSHN6qxePUay0NU9Wyq5l-nDNYry93c2S1~Pq-mQS1YTNAgdwqzpkPK1Fec6omhCx3wgXSbosOVOjOFODliKnJ0IzE6nL151Al4BhW45bGh-1hI7Vyrxmz-LB7GTJmZ-Seubc5VDxNImlKr7kh4G4~5mXM1XhK~DGce7QzBwTljTmXg295~SDC3tie--ht~PI1pfmA~4Art6TIqUu1rbiqdt~aAlKg30r6SF95f6OnjUgkWSN72VPo2kKZvJLbdbPkN0xnyZbmYCPDdv6VtEVPpCZInsi~wByw8Rvt51QHtkyWDJ8xsg__"
-            }
-            fill
-            sizes="768px"
-          />
+          {dailyDiscoveryData?.[0].image ? (
+            <Image alt="discovery" src={dailyDiscoveryData?.[0].image} fill sizes="768px" />
+          ) : (
+            <EmptyImage />
+          )}
         </div>
       </div>
       <ul>
-        {[...new Array(3)].map((_item, index) => (
-          <React.Fragment key={index}>
-            <DiscoveryItem
-              contentType="유튜브"
-              title="ㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㄹㅇㅁㄴㄹㅇㅁㅇㄹㄴㅁ"
-              imageUrl="https://s3-alpha-sig.figma.com/img/0765/8133/dcde9229b77417236ff0d50c7f427e83?Expires=1744588800&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=rOES0-J8KQ5hY1nRf0gj6BGpoFr7GYQtmMYSHN6qxePUay0NU9Wyq5l-nDNYry93c2S1~Pq-mQS1YTNAgdwqzpkPK1Fec6omhCx3wgXSbosOVOjOFODliKnJ0IzE6nL151Al4BhW45bGh-1hI7Vyrxmz-LB7GTJmZ-Seubc5VDxNImlKr7kh4G4~5mXM1XhK~DGce7QzBwTljTmXg295~SDC3tie--ht~PI1pfmA~4Art6TIqUu1rbiqdt~aAlKg30r6SF95f6OnjUgkWSN72VPo2kKZvJLbdbPkN0xnyZbmYCPDdv6VtEVPpCZInsi~wByw8Rvt51QHtkyWDJ8xsg__"
-            />
-            {index < [...new Array(3)].length - 1 && <div className="border-b" />}
-          </React.Fragment>
-        ))}
+        {dailyDiscoveryData?.map(
+          (item, index) =>
+            index > 0 &&
+            index < 3 && (
+              <React.Fragment key={item.id}>
+                <DiscoveryItem contentType={ContentsType[item.type]} title={item.title || ""} imageUrl={item.image} />
+                {index < 3 - 1 && <div className="border-b" />}
+              </React.Fragment>
+            )
+        )}
       </ul>
       <div className="relative flex w-full justify-center">
         <Link href={"/discovery"}>

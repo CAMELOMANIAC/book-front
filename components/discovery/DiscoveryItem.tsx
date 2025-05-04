@@ -1,9 +1,10 @@
 import Image from "next/image";
 import React from "react";
+import EmptyImage from "../common/EmptyImage";
 
 type Props = {
   className?: string;
-  imageUrl: string;
+  imageUrl?: string;
   contentType: string;
   title: string;
 };
@@ -14,9 +15,13 @@ const DiscoveryItem = ({ className, imageUrl, contentType, title, ...props }: Re
         <p className="relative text-sm font-bold text-[var(--highlight-color)]">{contentType ?? "타입"}</p>
         <p className="line-clamp-1 font-medium">{title ?? "제목"}</p>
       </div>
-      {imageUrl && (
+      {imageUrl ? (
         <div className="relative aspect-video h-12 overflow-hidden rounded-xl">
           <Image alt="discovery" src={imageUrl} fill sizes="768px" />
+        </div>
+      ) : (
+        <div className="relative aspect-video h-12 overflow-hidden rounded-xl">
+          <EmptyImage />
         </div>
       )}
     </li>
